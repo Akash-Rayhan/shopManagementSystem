@@ -4,11 +4,14 @@
 namespace App\Services;
 
 
+use App\Exports\EmployeeExport;
 use App\Model\Employee;
 use App\Model\Shop;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class EmployeeService
 {
@@ -137,6 +140,23 @@ class EmployeeService
             }
             return['employees'=> $searchedEmployee,'status'=>true];
         }catch(\Exception $e){
+            return ['status'=> false,'message'=> $e->getMessage()];
+        }
+    }
+
+    /**
+     * @param $request
+     * @return array|BinaryFileResponse
+     */
+    public function downloadExcel($request){
+        try {
+            $employees = json_decode($request->employees);
+            if(($employees)){
+
+                return Excel::download(new EmployeeExport($employees),'employeesList.xlsx');
+            }
+        }catch (\Exception $e){
+
             return ['status'=> false,'message'=> $e->getMessage()];
         }
     }

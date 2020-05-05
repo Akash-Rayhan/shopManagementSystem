@@ -129,16 +129,7 @@ class EmployeeController extends Controller
      * @return array|BinaryFileResponse
      */
     public function export(Request $request){
-        try {
-            $employees = json_decode($request->employees);
-            if(($employees)){
 
-                return Excel::download(new EmployeeExport($employees),'employeesList.xlsx');
-            }
-        }catch (\Exception $e){
-
-            return ['status'=> false,'message'=> $e->getMessage()];
-        }
-
+        return $this->employeeService->downloadExcel($request);
     }
 }
