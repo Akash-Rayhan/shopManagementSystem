@@ -9,52 +9,74 @@ use App\Model\Product;
 use App\Model\ProductVariation;
 use App\Model\Shop;
 use App\Model\SubCategory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ProductService
 {
 
     public function createNewProduct($request){
-        $userShop = Shop::where('user_id', Auth::id())->first();
-        $shopId = $userShop->id;
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|max:50',
-            'subcategory_id'=> 'required',
-            'category_id' => 'required'
-        ]);
-        if ($validator->passes()){
-            Product::create([
-                'name' => $request->name,
-                'subcategory_id' => $request->subcategory_id,
-                'category_id' => $request->category_id,
-                'shop_id' => $shopId
+        try {
+            $userShop = Shop::where('user_id', Auth::id())->first();
+            $shopId = $userShop->id;
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|max:50',
+                'subcategory_id'=> 'required',
+                'category_id' => 'required'
             ]);
-            return ['status' => true];
+            if ($validator->passes()){
+                Product::create([
+                    'name' => $request->name,
+                    'subcategory_id' => $request->subcategory_id,
+                    'category_id' => $request->category_id,
+                    'shop_id' => $shopId
+                ]);
+
+                return ['status' => true];
+            }
+
+            return ['error'=>$validator->errors()->all(),'status' => false];
+        }catch (\Exception $e){
+
+            return ['status'=> false, 'message'=> $e->getMessage()];
         }
-        return ['error'=>$validator->errors()->all(),'status' => false];
+
     }
     public function getAllProducts(){
-        $userShop = Shop::where('user_id', Auth::id())->first();
-        $shopId = $userShop->id;
-        return Product::where('shop_id', $shopId)->get();
+        try {
+            $userShop = Shop::where('user_id', Auth::id())->first();
+            $shopId = $userShop->id;
+
+            return Product::where('shop_id', $shopId)->get();
+        }catch (\Exception $e){
+
+            return ['status'=> false, 'message'=> $e->getMessage()];
+        }
+
     }
     public function createNewVariation($request){
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|max:50',
-            'quantity'=> 'required|min:0',
-            'price' => 'required|min:2'
-        ]);
-        if ($validator->passes()){
-            ProductVariation::create([
-                'name' => $request->name,
-                'quantity' => $request->quantity,
-                'price' => $request->price,
-                'product_id' => $request->product_id
+        try {
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|max:50',
+                'quantity'=> 'required|min:0',
+                'price' => 'required|min:2'
             ]);
-            return ['status' => true];
+            if ($validator->passes()){
+                ProductVariation::create([
+                    'name' => $request->name,
+                    'quantity' => $request->quantity,
+                    'price' => $request->price,
+                    'product_id' => $request->product_id
+                ]);
+                return ['status' => true];
+            }
+            return ['error'=>$validator->errors()->all(),'status' => false];
+        }catch (\Exception $e){
+            return ['status'=> false, 'message'=> $e->getMessage()];
         }
-        return ['error'=>$validator->errors()->all(),'status' => false];
+
     }
 
     /**
@@ -62,29 +84,47 @@ class ProductService
      * @return array
      */
     public function getAllVariations($request){
-        $variations=ProductVariation::where('product_id',$request->id)->get();
-        return ['variations'=>$variations];
+        try {
+            $variations=ProductVariation::where('product_id',$request->id)->get();
+            return ['variations'=>$variations];
+        }catch (\Exception $e){
+            return ['status'=> false, 'message'=> $e->getMessage()];
+        }
+
     }
 
     /**
      * @param $request
+     * @return array
      */
     public function updateProduct($request){
-        Product::where('id',$request->id)->update([
-            'name'=> $request->name,
-            'category_id'=>$request->category_id,
-            'subcategory_id'=> $request->subcategory_id
-        ]);
+        try {
+            Product::where('id',$request->id)->update([
+                'name'=> $request->name,
+                'category_id'=>$request->category_id,
+                'subcategory_id'=> $request->subcategory_id
+            ]);
+        }catch (\Exception $e){
+            return ['status'=> false, 'message'=> $e->getMessage()];
+        }
+
     }
 
     /**
      * @param $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return array
      */
     public function deleteProduct($request){
-        Product::find($request->id)->delete();
-        ProductVariation::where('product_id',$request->id)->delete();
-        return response()->json(['status'=> true]);
+        try {
+            DB::beginTransaction();
+            Product::find($request->id)->delete();
+            ProductVariation::where('product_id',$request->id)->delete();
+            DB::commit();
+            return ['status'=> true];
+        }catch (\Exception $e){
+            return ['status'=> false, 'message'=> $e->getMessage()];
+        }
+
     }
 
     /**
@@ -92,10 +132,11 @@ class ProductService
      * @return array|bool[]
      */
     public function searchProduct($request){
-        $name = $request->name;
-        $userShop = Shop::where('user_id', Auth::id())->first();
-        $shopId = $userShop->id;
+
         try {
+            $name = $request->name;
+            $userShop = Shop::where('user_id', Auth::id())->first();
+            $shopId = $userShop->id;
             $products = Product::select(
                 'product_variations.name as name',
                 'product_variations.quantity as quantity',

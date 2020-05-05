@@ -19,16 +19,27 @@ class ShopService
      * @return mixed
      */
     public function authUserShop(){
-        $user_id = Auth::id();
-        return Shop::where('user_id', $user_id)->first();
+        try {
+            $user_id = Auth::id();
+            return Shop::where('user_id', $user_id)->first();
+        }catch (\Exception $e){
+            return ['status'=> false, 'message'=> $e->getMessage()];
+        }
+
     }
 
     /**
      * @param $request
+     * @return array
      */
     public function createNewCategory($request){
-        $validated = $request->validated();
-        Category::create($validated);
+        try {
+            $validated = $request->validated();
+            Category::create($validated);
+        }catch (\Exception $e){
+            return ['status'=> false, 'message'=> $e->getMessage()];
+        }
+
     }
 
     /**
@@ -40,10 +51,16 @@ class ShopService
 
     /**
      * @param $request
+     * @return array
      */
     public function createNewSubCategory($request){
-        $validated = $request->validated();
-        SubCategory::create($validated);
+        try {
+            $validated = $request->validated();
+            SubCategory::create($validated);
+        }catch (\Exception $e){
+            return ['status'=> false, 'message'=> $e->getMessage()];
+        }
+
     }
 
     /**
@@ -51,8 +68,13 @@ class ShopService
      * @return array
      */
     public function getSubCategoriesOfTheCategory($request){
-        $subCategories = SubCategory::where('category_id',$request->id)->get();
-        return ['subcategories'=>$subCategories,'status'=>true];
+        try {
+            $subCategories = SubCategory::where('category_id',$request->id)->get();
+            return ['subcategories'=>$subCategories,'status'=>true];
+        }catch(\Exception $e){
+            return ['status'=> false, 'message'=> $e->getMessage()];
+        }
+
     }
 
 

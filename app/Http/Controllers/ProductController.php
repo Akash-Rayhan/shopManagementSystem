@@ -51,7 +51,8 @@ class ProductController extends Controller
         return response()->json(['variations'=>$response['variations'],'status'=>true]);
     }
     public function deleteProduct(Request $request){
-        return $this->productService->deleteProduct($request);
+        $response = $this->productService->deleteProduct($request);
+        return response()->json(['status'=> $response['status']]);
     }
     public function productSearch(Request $request){
         $response = $this->productService->searchProduct($request);

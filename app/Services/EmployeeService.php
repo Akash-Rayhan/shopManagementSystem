@@ -52,11 +52,16 @@ class EmployeeService
      * @return array
      */
     public function allEmployeeInformation(){
-        $userShop = Shop::where('user_id', Auth::id())->first();
-        $shopId = $userShop->id;
-        $employees=Employee::where('shop_id', $shopId)->get();
+        try {
+            $userShop = Shop::where('user_id', Auth::id())->first();
+            $shopId = $userShop->id;
+            $employees=Employee::where('shop_id', $shopId)->get();
 
-        return ['employees' => $employees, 'status' => true];
+            return ['employees' => $employees, 'status' => true];
+        }catch (\Exception $e){
+            return ['status'=> false, 'message'=> $e->getMessage()];
+        }
+
     }
 
     /**
