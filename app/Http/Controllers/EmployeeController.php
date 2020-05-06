@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\EmployeeExport;
+use App\Http\Requests\EmployeeRequest;
 use App\Model\Employee;
 use App\Services\EmployeeService;
 use Illuminate\Contracts\Foundation\Application;
@@ -37,33 +38,22 @@ class EmployeeController extends Controller
      * @return array|JsonResponse
      */
     public function getEmployees(){
-        try {
-            $response = $this->employeeService->allEmployeeInformation();
 
-            return response()->json(['status'=> $response['status'],'employees'=>$response['employees']]);
-        }catch(\Exception $e){
-            return ['success'=> false,'message'=>[$e->getMessage()]];
-        }
+        $response = $this->employeeService->allEmployeeInformation();
+
+        return response()->json(['status'=> $response['status'],'employees'=>$response['employees']]);
 
     }
 
     /**
-     * @param Request $request
+     * @param EmployeeRequest $request
      * @return array|JsonResponse
      */
-    public function storeEmployee(Request $request){
-        try {
-            $response = $this->employeeService->createEmployee($request);
-            if($response['status']){
+    public function storeEmployee(EmployeeRequest $request){
+        $response = $this->employeeService->createEmployee($request);
 
-                return response()->json(['success'=> 'Employee saved','status'=> true]);
-            }
+        return response()->json(['status'=> $response['status']]);
 
-            return response()->json(['error'=> $response['error'], 'status'=> false]);
-        }catch (\Exception $e){
-
-            return ['success'=> false,'message'=>[$e->getMessage()]];
-        }
 
     }
 
@@ -72,29 +62,19 @@ class EmployeeController extends Controller
      * @return array|JsonResponse
      */
     public function editEmployee(Request $request){
-        try {
-            $response=$this->employeeService->saveEditInformation($request);
+        $response=$this->employeeService->saveEditInformation($request);
 
-            return response()->json(['success'=> $response['success'],'status'=> $response['status']]);
-        }catch (\Exception $e){
+        return response()->json(['success'=> $response['success'],'status'=> $response['status']]);
 
-            return ['success'=> false,'message'=>[$e->getMessage()]];
-        }
 
     }
 
     /**
      * @param Request $request
-     * @return array
+     * @return void
      */
     public function deleteEmployee(Request $request){
-        try {
             $this->employeeService->deleteEmployee($request);
-        }catch(\Exception $e){
-
-            return ['success'=> false,'message'=>[$e->getMessage()]];
-        }
-
     }
 
     /**

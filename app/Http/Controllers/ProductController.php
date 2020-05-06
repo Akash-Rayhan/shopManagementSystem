@@ -3,62 +3,108 @@
 namespace App\Http\Controllers;
 
 
+use App\Http\Requests\ProductRequest;
+use App\Http\Requests\VariationRequest;
 use App\Model\Product;
 use App\Model\ProductVariation;
 use App\Services\ProductService;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class ProductController extends Controller
 {
     protected $productService;
-    public function __construct(ProductService $productService)
-    {
+
+    /**
+     * ProductController constructor.
+     * @param ProductService $productService
+     */
+    public function __construct(ProductService $productService){
         $this->productService = $productService;
     }
+
+    /**
+     * @return Application|Factory|View
+     */
     public function addProduct(){
         return view('User.addProduct');
     }
 
+    /**
+     * @return JsonResponse
+     */
     public function getProducts(){
         return response()->json([
             'success' => true,
             'products' => $this->productService->getAllProducts()
         ]);
     }
-    public function storeProduct(Request $request){
+
+    /**
+     * @param ProductRequest $request
+     * @return JsonResponse
+     */
+    public function storeProduct(ProductRequest $request){
        $response=$this->productService->createNewProduct($request);
-        if($response['status']){
 
-            return response()->json(['success'=> 'Product saved','status'=> true]);
-        }
-
-        return response()->json(['error'=> $response['error'], 'status'=> false]);
+        return response()->json(['status'=> $response['status']]);
     }
+
+    /**
+     * @param Request $request
+     */
     public function updateProduct(Request $request){
         $this->productService->updateProduct($request);
     }
-    public function addVariation(Request $request){
+
+    /**
+     * @param VariationRequest $request
+     * @return JsonResponse
+     */
+    public function addVariation(VariationRequest $request){
         $response=$this->productService->createNewVariation($request);
-        if($response['status']){
 
-            return response()->json(['success'=> 'Variation saved','status'=> true]);
-        }
-
-        return response()->json(['error'=> $response['error'], 'status'=> false]);
+        return response()->json(['status'=> $response['status']]);
     }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+
     public function getVariations(Request $request){
         $response = $this->productService->getAllVariations($request);
         return response()->json(['variations'=>$response['variations'],'status'=>true]);
     }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function deleteProduct(Request $request){
         $response = $this->productService->deleteProduct($request);
         return response()->json(['status'=> $response['status']]);
     }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function productSearch(Request $request){
         $response = $this->productService->searchProduct($request);
         return response()->json(['products'=> $response['products'], 'status'=> $response['status']]);
     }
-    public function filterProduct(Request $request,Product $product,ProductVariation $productVariation){
+
+    /**
+     * @param Request $request
+     * @param Product $product
+     * @param ProductVariation $productVariation
+     * @return JsonResponse
+     */
+    public function filterProduct(Request $request, Product $product, ProductVariation $productVariation){
         $response = $this->productService->filterProducts($request,$product,$productVariation);
         return response()->json(['filteredProducts' => $response['filteredProducts'],'status' => $response['status']]);
     }

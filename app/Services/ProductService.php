@@ -4,6 +4,7 @@
 namespace App\Services;
 
 
+use App\Http\Requests\ProductRequest;
 use App\Model\Category;
 use App\Model\Product;
 use App\Model\ProductVariation;
@@ -17,33 +18,34 @@ use Illuminate\Support\Facades\Validator;
 class ProductService
 {
 
+    /**
+     * @param $request
+     * @return array|bool[]
+     */
     public function createNewProduct($request){
+
         try {
+            //dd($request->name);
             $userShop = Shop::where('user_id', Auth::id())->first();
             $shopId = $userShop->id;
-            $validator = Validator::make($request->all(), [
-                'name' => 'required|max:50',
-                'subcategory_id'=> 'required',
-                'category_id' => 'required'
+            Product::create([
+                'name'=>$request->name,
+                'subcategory_id'=>$request->category_id,
+                'category_id'=>$request->subcategory_id,
+                'shop_id'=>$shopId
             ]);
-            if ($validator->passes()){
-                Product::create([
-                    'name' => $request->name,
-                    'subcategory_id' => $request->subcategory_id,
-                    'category_id' => $request->category_id,
-                    'shop_id' => $shopId
-                ]);
 
-                return ['status' => true];
-            }
-
-            return ['error'=>$validator->errors()->all(),'status' => false];
+            return ['status' => true];
         }catch (\Exception $e){
 
             return ['status'=> false, 'message'=> $e->getMessage()];
         }
 
     }
+
+    /**
+     * @return array
+     */
     public function getAllProducts(){
         try {
             $userShop = Shop::where('user_id', Auth::id())->first();
@@ -56,24 +58,23 @@ class ProductService
         }
 
     }
+
+    /**
+     * @param $request
+     * @return array|bool[]
+     */
     public function createNewVariation($request){
         try {
-            $validator = Validator::make($request->all(), [
-                'name' => 'required|max:50',
-                'quantity'=> 'required|min:0',
-                'price' => 'required|min:2'
-            ]);
-            if ($validator->passes()){
                 ProductVariation::create([
                     'name' => $request->name,
                     'quantity' => $request->quantity,
                     'price' => $request->price,
                     'product_id' => $request->product_id
                 ]);
+
                 return ['status' => true];
-            }
-            return ['error'=>$validator->errors()->all(),'status' => false];
         }catch (\Exception $e){
+
             return ['status'=> false, 'message'=> $e->getMessage()];
         }
 
@@ -86,8 +87,10 @@ class ProductService
     public function getAllVariations($request){
         try {
             $variations=ProductVariation::where('product_id',$request->id)->get();
+            
             return ['variations'=>$variations];
         }catch (\Exception $e){
+
             return ['status'=> false, 'message'=> $e->getMessage()];
         }
 
@@ -105,6 +108,7 @@ class ProductService
                 'subcategory_id'=> $request->subcategory_id
             ]);
         }catch (\Exception $e){
+
             return ['status'=> false, 'message'=> $e->getMessage()];
         }
 
@@ -120,8 +124,10 @@ class ProductService
             Product::find($request->id)->delete();
             ProductVariation::where('product_id',$request->id)->delete();
             DB::commit();
+
             return ['status'=> true];
         }catch (\Exception $e){
+
             return ['status'=> false, 'message'=> $e->getMessage()];
         }
 
@@ -173,6 +179,7 @@ class ProductService
             $userShop = Shop::where('user_id', Auth::id())->first();
             $shopId = $userShop->id;
             $filteredProducts = null;
+
             if(($category) || ($subcategory) || ($priceRange) || ($quantityRange)){
                 $product = $product->newQuery();
                 if(($category)){
@@ -191,8 +198,10 @@ class ProductService
                 }
                 $filteredProducts = $productVariation->whereIn('product_id',$productIds)->get();
             }
+
             return ['filteredProducts'=> $filteredProducts,'status'=> true];
         }catch (\Exception $e){
+
             return ['status'=> false];
         }
 

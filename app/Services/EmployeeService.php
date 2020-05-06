@@ -23,12 +23,7 @@ class EmployeeService
         try {
             $userShop = Shop::where('user_id', Auth::id())->first();
             $shopId = $userShop->id;
-            $validator = Validator::make($request->all(), [
-                'name' => 'required|max:50',
-                'salary'=>'required'
-            ]);
 
-            if ($validator->passes()) {
                 Employee::create([
                     'name' => $request->name,
                     'salary' => $request->salary,
@@ -39,10 +34,8 @@ class EmployeeService
                 ]);
 
                 return ['status' => true];
-            }
-
-            return ['error'=>$validator->errors()->all()];
         }catch (\Exception $e){
+
             return ['status'=> false, 'message'=> $e->getMessage()];
         }
 

@@ -18,12 +18,12 @@
                     <!-- Product Form -->
 
 
-
-
-
-
                 <div class="container">
                     <div class="alert alert-danger print-error-msg" style="display:none">
+                        <ul></ul>
+                    </div>
+
+                    <div class="alert alert-success print-success-msg" style="display:none">
                         <ul></ul>
                     </div>
 
@@ -229,9 +229,13 @@
             function saveVariation(name,quantity,price){
                 $.ajax({
                     url: '{{route('addVariation')}}',
+                    headers: {
+                        'X-CSRF-TOKEN':"{{csrf_token()}}",
+                        //'Content-Type':'application/json',
+                        'accept':"application/json"
+                    },
                     method: 'POST',
                     data:{
-                        '_token' : '{{csrf_token()}}',
                         'name':name,
                         'quantity': quantity,
                         'price': price,
@@ -338,22 +342,29 @@
             function saveProduct(productName,subcategory_id,category_id){
                 $.ajax({
                     url: '{{route('storeProduct')}}',
+                    headers: {
+                        'X-CSRF-TOKEN':"{{csrf_token()}}",
+                        //'Content-Type':'application/json',
+                        'accept':"application/json"
+                    },
                     method: 'POST',
                     data:{
-                        '_token' : '{{csrf_token()}}',
                         'name':productName,
                         'subcategory_id': subcategory_id,
                         'category_id': category_id
                     },
-                    success: function(data) {
-                        if($.isEmptyObject(data.error)){
-                            alert(data.success);
-                            console.log(data);
-                        }else{
-                            printErrorMsg(data.error);
-                            console.log(data);
-                        }
-                    }
+                    // success: function(data,message) {
+                    //     console.log(message);
+                    //     if($.isEmptyObject(message)){
+                    //         printSuccessMsg(data.success);
+                    //
+                    //     }else{
+                    //         printErrorMsg(data.error);
+                    //         console.log(data);
+                    //     }
+                    // }
+                }).done(function (data,json) {
+                    console.log(json);
                 });
             }
             function getCategoriesforEdit(){
@@ -436,7 +447,13 @@
                 });
             }
 
-
+            function printSuccessMsg(msg) {
+                $(".print-success-msg").find("ul").html('');
+                $(".print-success-msg").css('display', 'block');
+                $.each(msg, function (key, value) {
+                    $(".print-success-msg").find("ul").append('<li>' + value + '</li>');
+                });
+            }
 
         });
 
