@@ -19,14 +19,12 @@
 
 
                 <div class="container">
-                    <div class="alert alert-danger print-error-msg" style="display:none">
+                    <div class="alert alert-danger" style="display:none" id="error-message">
+                    <ul></ul>
+                    </div>
+                    <div class="alert alert-success" style="display:none" id="success-message">
                         <ul></ul>
                     </div>
-
-                    <div class="alert alert-success print-success-msg" style="display:none">
-                        <ul></ul>
-                    </div>
-
                 </div>
                 <!-- Products List -->
                 <div class="card">
@@ -230,26 +228,26 @@
                 $.ajax({
                     url: '{{route('addVariation')}}',
                     headers: {
-                        'X-CSRF-TOKEN':"{{csrf_token()}}",
+                        'X-CSRF-TOKEN': "{{csrf_token()}}",
                         //'Content-Type':'application/json',
-                        'accept':"application/json"
+                        'accept': "application/json"
                     },
                     method: 'POST',
-                    data:{
-                        'name':name,
+                    data: {
+                        'name': name,
                         'quantity': quantity,
                         'price': price,
                         'product_id': addProductId
                     },
-                    success: function(data) {
-                        if($.isEmptyObject(data.error)){
-                            alert(data.success);
-                            console.log(data);
-                        }else{
-                            printErrorMsg(data.error);
-                            console.log(data);
-                        }
+                }).done(function (data) {
+                    console.log(data.message);
+                    if($.isEmptyObject(data.message)){
+
+                    }else{
+                        printErrorMsg(data.message);
                     }
+                }).fail(function (error) {
+                    console.log(error);
                 });
             }
 
@@ -353,18 +351,15 @@
                         'subcategory_id': subcategory_id,
                         'category_id': category_id
                     },
-                    // success: function(data,message) {
-                    //     console.log(message);
-                    //     if($.isEmptyObject(message)){
-                    //         printSuccessMsg(data.success);
-                    //
-                    //     }else{
-                    //         printErrorMsg(data.error);
-                    //         console.log(data);
-                    //     }
-                    // }
-                }).done(function (data,json) {
-                    console.log(json);
+                }).done(function (data) {
+                    console.log(data.message);
+                    if($.isEmptyObject(data.message)){
+                        printSuccessMsg(data.success);
+                    }else{
+                        printErrorMsg(data.message);
+                    }
+                }).fail(function (error) {
+                    console.log(error);
                 });
             }
             function getCategoriesforEdit(){
@@ -440,20 +435,18 @@
             }
 
             function printErrorMsg (msg) {
-                $(".print-error-msg").find("ul").html('');
-                $(".print-error-msg").css('display', 'block');
-                $.each(msg, function (key, value) {
-                    $(".print-error-msg").find("ul").append('<li>' + value + '</li>');
-                });
+                $("#error-message").find("ul").html('');
+                $("#error-message").css('display', 'block');
+                    $("#error-message").find("ul").append('<li>' + msg + '</li>');
+
+            }
+            function printSuccessMsg (msg) {
+                $("#success-message").find("ul").html('');
+                $("#success-message").css('display', 'block');
+                $("#success-message").find("ul").append('<li>' + msg + '</li>');
+
             }
 
-            function printSuccessMsg(msg) {
-                $(".print-success-msg").find("ul").html('');
-                $(".print-success-msg").css('display', 'block');
-                $.each(msg, function (key, value) {
-                    $(".print-success-msg").find("ul").append('<li>' + value + '</li>');
-                });
-            }
 
         });
 

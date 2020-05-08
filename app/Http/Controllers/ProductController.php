@@ -50,7 +50,10 @@ class ProductController extends Controller
     public function storeProduct(ProductRequest $request){
        $response=$this->productService->createNewProduct($request);
 
-        return response()->json(['status'=> $response['status']]);
+        return response()->json([
+            'status'=> $response['status'],
+            'success'=>'Product saved'
+        ]);
     }
 
     /**
@@ -67,7 +70,10 @@ class ProductController extends Controller
     public function addVariation(VariationRequest $request){
         $response=$this->productService->createNewVariation($request);
 
-        return response()->json(['status'=> $response['status']]);
+        return response()->json([
+            'status'=> $response['status'],
+            'success'=>"Variation saved"
+        ]);
     }
 
     /**
@@ -77,7 +83,10 @@ class ProductController extends Controller
 
     public function getVariations(Request $request){
         $response = $this->productService->getAllVariations($request);
-        return response()->json(['variations'=>$response['variations'],'status'=>true]);
+        return response()->json([
+            'variations'=>$response['variations'],
+            'status'=>true
+        ]);
     }
 
     /**
@@ -86,7 +95,9 @@ class ProductController extends Controller
      */
     public function deleteProduct(Request $request){
         $response = $this->productService->deleteProduct($request);
-        return response()->json(['status'=> $response['status']]);
+        return response()->json([
+            'status'=> $response['status']
+        ]);
     }
 
     /**
@@ -95,7 +106,10 @@ class ProductController extends Controller
      */
     public function productSearch(Request $request){
         $response = $this->productService->searchProduct($request);
-        return response()->json(['products'=> $response['products'], 'status'=> $response['status']]);
+        return response()->json([
+            'products'=> $response['products'],
+            'status'=> $response['status']
+        ]);
     }
 
     /**
@@ -106,6 +120,9 @@ class ProductController extends Controller
      */
     public function filterProduct(Request $request, Product $product, ProductVariation $productVariation){
         $response = $this->productService->filterProducts($request,$product,$productVariation);
-        return response()->json(['filteredProducts' => $response['filteredProducts'],'status' => $response['status']]);
+        return response()->json([
+            'filteredProducts' => $response['filteredProducts'],
+            'status' => $response['status']
+        ]);
     }
 }

@@ -64,7 +64,7 @@ class ProductRequest extends FormRequest
                 'message' => $errors,
                 'data' => null
             ];
-            $response = new JsonResponse($json, 422);
+            $response = new JsonResponse($json);
 
             throw (new ValidationException($validator, $response))->errorBag($this->errorBag)->redirectTo($this->getRedirectUrl());
         } else {

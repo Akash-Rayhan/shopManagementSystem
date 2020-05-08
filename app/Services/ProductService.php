@@ -35,7 +35,9 @@ class ProductService
                 'shop_id'=>$shopId
             ]);
 
-            return ['status' => true];
+            return [
+                'status' => true,
+            ];
         }catch (\Exception $e){
 
             return ['status'=> false, 'message'=> $e->getMessage()];
@@ -87,7 +89,7 @@ class ProductService
     public function getAllVariations($request){
         try {
             $variations=ProductVariation::where('product_id',$request->id)->get();
-            
+
             return ['variations'=>$variations];
         }catch (\Exception $e){
 
