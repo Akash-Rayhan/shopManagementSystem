@@ -44,10 +44,7 @@
                         <div class="card col-md-5">
                             <div class="card-header">Variations</div>
                             <div class="card-body" id="variation-dom">
-                                <table width="100%" id="variation-table">
 
-
-                                </table>
                             </div>
                         </div>
                     </div>
@@ -129,11 +126,15 @@
                         'id': id
                     }
                 }).done(function (data) {
+
                     allVariationsDom(data.variations);
                 })
             }
             function allVariationsDom(variations){
-                let html='<tr>'+
+                let html='<table width="100%">\n' +
+                    '\n' +
+                    '\n' +
+                    '<tr>'+
                     '<th>Name</th>'+
                     '<th>Quantity</th>'+
                     '<th>Price</th>'+
@@ -145,7 +146,8 @@
                         '<td>'+variations[i].price+'</td>'+
                         '</tr>';
                 }
-                $('#variation-table').html(html);
+                html+='</table>';
+                $('#variation-dom').html(html);
             }
             $('#product_div').on('click','.edit_modal',function () {
                 editId = $(this).data('id');
@@ -240,12 +242,14 @@
                         'product_id': addProductId
                     },
                 }).done(function (data) {
-                    console.log(data.message);
+                    console.log(addProductId);
+                    getVariations(addProductId);
                     if($.isEmptyObject(data.message)){
-
+                        printSuccessMsg(data.success);
                     }else{
                         printErrorMsg(data.message);
                     }
+
                 }).fail(function (error) {
                     console.log(error);
                 });

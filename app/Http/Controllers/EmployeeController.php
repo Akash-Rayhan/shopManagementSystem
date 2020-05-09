@@ -41,7 +41,10 @@ class EmployeeController extends Controller
 
         $response = $this->employeeService->allEmployeeInformation();
 
-        return response()->json(['status'=> $response['status'],'employees'=>$response['employees']]);
+        return response()->json([
+            'status'=> $response['status'],
+            'employees'=>$response['employees']
+        ]);
 
     }
 
@@ -52,7 +55,10 @@ class EmployeeController extends Controller
     public function storeEmployee(EmployeeRequest $request){
         $response = $this->employeeService->createEmployee($request);
 
-        return response()->json(['status'=> $response['status']]);
+        return response()->json([
+            'status'=> $response['status'],
+            'success'=> 'Employee saved'
+        ]);
 
 
     }
@@ -64,7 +70,10 @@ class EmployeeController extends Controller
     public function editEmployee(Request $request){
         $response=$this->employeeService->saveEditInformation($request);
 
-        return response()->json(['success'=> $response['success'],'status'=> $response['status']]);
+        return response()->json([
+            'success'=> $response['success'],
+            'status'=> $response['status']
+        ]);
 
 
     }
@@ -91,7 +100,10 @@ class EmployeeController extends Controller
      */
     public function filterEmployee(Request $request, Employee $employee){
         $response = $this->employeeService->filterEmployees($request,$employee);
-        return response()->json(['employees'=>$response['employees'],'status'=> $response['status']]);
+        return response()->json([
+            'employees'=>$response['employees'],
+            'status'=> $response['status']
+        ]);
     }
 
     /**

@@ -71,8 +71,8 @@
                                 'name': productName
                             }
                         }).done(function (data) {
-                            console.log(data);
-                            searchedProductsDom(data.products)
+                            console.log(data.products);
+                            searchedProductsDom(data.products);
                         }).fail(function (error) {
                             console.log(error);
                         })

@@ -142,6 +142,7 @@ class ProductService
     public function searchProduct($request){
 
         try {
+
             $name = $request->name;
             $userShop = Shop::where('user_id', Auth::id())->first();
             $shopId = $userShop->id;
@@ -153,15 +154,18 @@ class ProductService
                 ->leftJoin('product_variations',['product_variations.product_id' => 'products.id']);
 
             $products->where('products.shop_id', $shopId)
+
                 ->where(function ($products) use ($name){
                     $products->where('products.name','like',"%{$name}%");
-                    $products->orwhere('products_variations.name','like',"%{$name}%");
+                    $products->orwhere('product_variations.name','like',"%{$name}%");
             });
-
-            return ['success'=> true, 'products'=> $products->get()];
+            return [
+                'status'=> true,
+                'products'=> $products->get()
+            ];
         }catch(\Exception $e){
 
-            return ['success'=> false];
+            return ['status'=> false,'message'=>$e->getMessage()];
         }
 
     }

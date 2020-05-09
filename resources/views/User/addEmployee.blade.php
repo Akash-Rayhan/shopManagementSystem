@@ -16,10 +16,12 @@
                 <!-- Product Form -->
 
                 <div class="container">
-                    <div class="alert alert-danger print-error-msg" style="display:none">
+                    <div class="alert alert-danger" style="display:none" id="error-message">
                         <ul></ul>
                     </div>
-
+                    <div class="alert alert-success" style="display:none" id="success-message">
+                        <ul></ul>
+                    </div>
                 </div>
                 <!-- Products List -->
                 <div class="card">
@@ -198,15 +200,16 @@
                         'name': name,
                         'salary': salary,
                     },
-                    success: function(data) {
-                        if($.isEmptyObject(data.error)){
-                            alert(data.success);
-                            console.log(data);
-                        }else{
-                            printErrorMsg(data.error);
-                            console.log(data);
-                        }
+                }).done(function (data) {
+                    console.log(data);
+                    if($.isEmptyObject(data.message)){
+                        printSuccessMsg(data.success);
+                    }else{
+                        printErrorMsg(data.message);
                     }
+
+                }).fail(function (error) {
+                    console.log(error);
                 });
             }
 
@@ -231,11 +234,16 @@
 
             }
             function printErrorMsg (msg) {
-                $(".print-error-msg").find("ul").html('');
-                $(".print-error-msg").css('display', 'block');
-                $.each(msg, function (key, value) {
-                    $(".print-error-msg").find("ul").append('<li>' + value + '</li>');
-                });
+                $("#error-message").find("ul").html('');
+                $("#error-message").css('display', 'block');
+                $("#error-message").find("ul").append('<li>' + msg + '</li>');
+
+            }
+            function printSuccessMsg (msg) {
+                $("#success-message").find("ul").html('');
+                $("#success-message").css('display', 'block');
+                $("#success-message").find("ul").append('<li>' + msg + '</li>');
+
             }
         });
 
